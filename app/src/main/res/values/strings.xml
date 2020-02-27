@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SQList</string>
+    <string name="app_name">SQLContacts</string>
     <string name="displayName">Display name</string>
     <string name="value">Value</string>
     <string name="add_constant">Add Constant</string>

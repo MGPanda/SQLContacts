@@ -11,15 +11,13 @@ public class MyDB {
 
     private SQLiteDatabase database;
 
-    public final static String EMP_TABLE = "constants"; // name of table
+    public final static String EMP_TABLE = "contacts"; // name of table
 
-    public final static String EMP_ID = "_id"; // id value for employee
-    public final static String EMP_NAME = "value";  // name of employee
-
-    private static final String[] items = {"Gravity: Death Star I - 3.53036e-07", "Gravity: Earth - 9.80685", "Gravity: Jupiter - 23.12",
-            "Gravity: Mars - 3.71", "Gravity: Mercury - 3.7",
-            "Gravity: Moon - 1.6", "Gravity: Neptune - 11", "Gravity: Pluto - 0.6", "Gravity: Saturn - 8.96", "Gravity: Sun - 275",
-            "Gravity: The Island - 4.81516", "Gravity: Uranus - 8.69", "Gravity: Venus - 8.87"};
+    public final static String CON_ID = "_id"; // id value for employee
+    public final static String CON_NAME = "name";  // name of employee
+    public final static String CON_SURNAME = "surname";
+    public final static String CON_NUMBER = "number";
+    public final static String CON_FULLNAME = "fullname";
 
     /**
      * @param context
@@ -30,27 +28,47 @@ public class MyDB {
     }
 
 
-    public long createRecords(int id, String name) {
+    public long createRecords(int id, String name, String surname, int number) {
+        if (id == 0) {
+            Cursor c = selectRecords();
+            c.moveToLast();
+            id = c.getInt(0)+1;
+        }
         ContentValues values = new ContentValues();
-        values.put(EMP_ID, id);
-        values.put(EMP_NAME, name);
+        values.put(CON_ID, id);
+        values.put(CON_NAME, name);
+        values.put(CON_SURNAME, surname);
+        values.put(CON_NUMBER, number);
+        values.put(CON_FULLNAME, name + " " + surname);
         return database.insert(EMP_TABLE, null, values);
     }
 
-    public void insertItems() {
-        for (int i = 0; i < items.length; i++) {
-            createRecords(i, items[i]);
-        }
+    public void insertContacts() {
+        createRecords(1, "John", "J. Carmack", 42069);
+        createRecords(2, "Tomeu", "Penya", 12345);
     }
 
     public Cursor selectRecords() {
-        String[] cols = new String[]{EMP_ID, EMP_NAME};
+        String[] cols = new String[]{CON_ID, CON_NAME, CON_SURNAME, CON_NUMBER, CON_FULLNAME};
         Cursor mCursor = database.query(true, EMP_TABLE, cols, null
-                , null, null, null, null, null);
+                , null, null, null, "name asc", null);
         if (mCursor != null) {
             mCursor.moveToFirst();
         }
         return mCursor; // iterate to get each value.
+    }
+
+    public void deleteItem(String s) {
+        database.delete(EMP_TABLE, "fullname = '" + s + "'", null);
+    }
+
+    public long updateItem(String name, String surname, int number) {
+        ContentValues values = new ContentValues();
+        values.put(CON_NAME, name);
+        values.put(CON_SURNAME, surname);
+        values.put(CON_NUMBER, number);
+        values.put(CON_FULLNAME, name + " " + surname);
+        return database.update(EMP_TABLE, values, "number = " + number, null);
     }
 
     public SQLiteDatabase getDatabase() {
